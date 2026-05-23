@@ -34,7 +34,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="packagee.PanelRound" name="LayoutPanelRound">
+    <Container class="org.netbeans.modules.form.InvalidComponent" name="LayoutPanelRound">
       <Properties>
         <Property name="radius" type="int" value="50"/>
       </Properties>
@@ -62,14 +62,10 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Container class="packagee.PanelRound" name="SuperiorPanelRound">
+        <Container class="org.netbeans.modules.form.InvalidComponent" name="SuperiorPanelRound">
           <Properties>
             <Property name="radius" type="int" value="50"/>
           </Properties>
-          <Events>
-            <EventHandler event="mouseDragged" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="SuperiorPanelRoundMouseDragged"/>
-            <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="SuperiorPanelRoundMousePressed"/>
-          </Events>
 
           <Layout>
             <DimensionLayout dim="0">

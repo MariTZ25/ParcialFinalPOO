@@ -19,15 +19,17 @@ import javax.swing.UIManager;
 public class LoginView extends javax.swing.JFrame {
 
     private int x, y;
+    private LoginController loginController;
     private ArrayList<User> users;
     private ArrayList<Hospitalization> hospitalizations;
     private ArrayList<Appointment> appointments;
 
-    public LoginView() {
+    public LoginView(LoginController loginController) {
         initComponents();
         this.setBackground(new Color(0, 0, 0, 0));
         this.setLocationRelativeTo(null);
-
+        
+        this.loginController = loginController;
         this.users = new ArrayList<>();
         this.users.add(new Administrator(0, "admin", "admin", "adnim", "admin123"));
     }
@@ -475,10 +477,17 @@ public class LoginView extends javax.swing.JFrame {
         } catch (Exception ex) {
             System.err.println("Failed to initialize LaF");
         }
+        
+        ArrayList<User> users = new ArrayList<>();
+        ArrayList<Appointment> appointments = new ArrayList<>();
+        ArrayList<Hospitalization> hospitalizations = new ArrayList<>();
+
+        LoginController loginController = new LoginController(users, appointments, hospitalizations);
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new LoginView().setVisible(true);
+                new LoginView(loginController).setVisible(true);
             }
         });
     }

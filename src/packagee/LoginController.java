@@ -4,11 +4,24 @@
  */
 package packagee;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Sahid
  */
 public class LoginController {
+
+    private ArrayList<User> users;
+    private ArrayList<Appointment> appointments;
+    private ArrayList<Hospitalization> hospitalizations;
+    
+    public LoginController(ArrayList<User> users, ArrayList<Appointment> appointments, ArrayList<Hospitalization> hospitalizations) {
+        this.users = users;
+        this.appointments = appointments;
+        this.hospitalizations = hospitalizations;
+    }
+    
     public Response login(String username, String password) {
 
         User user = HospitalData.findUserByUsername(username);

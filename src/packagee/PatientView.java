@@ -24,6 +24,7 @@ public class PatientView extends javax.swing.JFrame {
     private Patient patient;
     private ArrayList<Appointment> appointments;
     private ArrayList<Hospitalization> hospitalizations;
+    private PatientController patientController;
 
     public PatientView(User user,Patient patient, ArrayList<User> users, ArrayList<Appointment>appointments, ArrayList<Hospitalization> hospitalizations) {
         initComponents();
@@ -39,6 +40,11 @@ public class PatientView extends javax.swing.JFrame {
         }
         this.setBackground(new Color(0, 0, 0, 0));
         this.setLocationRelativeTo(null);
+    }
+    
+    private LoginController createLoginController() {
+        LoginController loginController = new LoginController(patientController.getUsers(), patientController.getAppointments(), patientController.getHospitalizations());
+        return loginController;
     }
 
     /**
@@ -819,9 +825,8 @@ public class PatientView extends javax.swing.JFrame {
     }//GEN-LAST:event_SaveButtonActionPerformed
 
     private void LogoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogoutButtonActionPerformed
-        LoginView login = new LoginView();
         this.setVisible(false);
-        login.setVisible(true);
+        new LoginView(createLoginController()).setVisible(true);
     }//GEN-LAST:event_LogoutButtonActionPerformed
 
     private void BackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackButtonActionPerformed

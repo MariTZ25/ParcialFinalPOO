@@ -4,11 +4,28 @@
  */
 package packagee;
 
+import java.util.ArrayList;
+import static packagee.HospitalData.appointments;
+import static packagee.HospitalData.hospitalizations;
+import static packagee.HospitalData.users;
+
 /**
  *
  * @author Sahid
  */
 public class DoctorController {
+    public ArrayList<User> getUsers() { 
+        return users;
+    }
+    
+    public ArrayList<Appointment> getAppointments() { 
+        return appointments; 
+    }
+    
+    public ArrayList<Hospitalization> getHospitalizations() { 
+        return hospitalizations; 
+    }
+    
     public Response registerDoctor(
             long id,
             String username,

@@ -5,11 +5,29 @@
 package packagee;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import static packagee.HospitalData.appointments;
+import static packagee.HospitalData.hospitalizations;
+import static packagee.HospitalData.users;
 /**
  *
  * @author Sahid
  */
 public class PatientController {
+    
+    public ArrayList<User> getUsers() { 
+        return users;
+    }
+    
+    public ArrayList<Appointment> getAppointments() { 
+        return appointments; 
+    }
+    
+    public ArrayList<Hospitalization> getHospitalizations() { 
+        return hospitalizations; 
+    }
+    
+    
     public Response registerPatient(
             long id,
             String username,
@@ -114,4 +132,7 @@ public class PatientController {
 
         return new Response(StatusCode.OK, "Paciente actualizado correctamente");
     }
+    
 }
+
+
