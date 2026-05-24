@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import modelo.Administrator;
 import modelo.Appointment;
@@ -55,6 +56,19 @@ public class PatientView extends javax.swing.JFrame {
         LoginController loginController = new LoginController(patientController.getUsers(), patientController.getAppointments(), patientController.getHospitalizations());
         return loginController;
     }
+    
+    private void clearSaveForm() {
+        UserTextField.setText("");
+        FirstnameTextField.setText("");
+        LastnameTextField.setText("");
+        PasswordTextField.setText("");
+        PasswordConfirmTextField.setText("");
+        EmailTextField.setText("");
+        BirthdateTextField.setText("");
+        PhoneTextField.setText("");
+        AdressTextField.setText("");
+        GenderComboBox.setSelectedIndex(0);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -72,8 +86,8 @@ public class PatientView extends javax.swing.JFrame {
         BackButton = new javax.swing.JButton();
         PatientViewTabbedPane = new javax.swing.JTabbedPane();
         AppointmentHistoryPanel = new javax.swing.JPanel();
-        ScrollPane_3 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        AppointmentHistory_ScrollPane = new javax.swing.JScrollPane();
+        AppointmentHistory_Table = new javax.swing.JTable();
         RefreshButton = new javax.swing.JButton();
         LogoutButton = new javax.swing.JButton();
         ModifyInfoPanel = new javax.swing.JPanel();
@@ -122,13 +136,13 @@ public class PatientView extends javax.swing.JFrame {
         DesiredRoomTypeComboBox = new javax.swing.JComboBox<>();
         HospitalizationObservationsLabel = new javax.swing.JLabel();
         Hospitalization_ObservationsScrollPane = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        Hospitalization_ObservationsTextArea = new javax.swing.JTextArea();
         CreateHospitalizationButton = new javax.swing.JButton();
         CancelAppointmentLabel = new javax.swing.JLabel();
         IDAppointmentLabel = new javax.swing.JLabel();
         CancelAppointmentObservationLabel = new javax.swing.JLabel();
         Cancel_ObservationsScrollPane = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        Cancel_ObservationsTextArea = new javax.swing.JTextArea();
         CancelButton = new javax.swing.JButton();
         HospitalizationReasonScrollPane = new javax.swing.JScrollPane();
         HospitalizationReasonTextArea = new javax.swing.JTextArea();
@@ -203,8 +217,8 @@ public class PatientView extends javax.swing.JFrame {
             .addComponent(PatientViewLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        jTable1.setAutoCreateRowSorter(true);
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        AppointmentHistory_Table.setAutoCreateRowSorter(true);
+        AppointmentHistory_Table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -230,7 +244,7 @@ public class PatientView extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        ScrollPane_3.setViewportView(jTable1);
+        AppointmentHistory_ScrollPane.setViewportView(AppointmentHistory_Table);
 
         RefreshButton.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
         RefreshButton.setText("Refresh");
@@ -254,7 +268,7 @@ public class PatientView extends javax.swing.JFrame {
             AppointmentHistoryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(AppointmentHistoryPanelLayout.createSequentialGroup()
                 .addGap(62, 62, 62)
-                .addComponent(ScrollPane_3, javax.swing.GroupLayout.PREFERRED_SIZE, 1167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(AppointmentHistory_ScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 1167, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(51, Short.MAX_VALUE))
             .addGroup(AppointmentHistoryPanelLayout.createSequentialGroup()
                 .addGap(602, 602, 602)
@@ -267,7 +281,7 @@ public class PatientView extends javax.swing.JFrame {
             AppointmentHistoryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(AppointmentHistoryPanelLayout.createSequentialGroup()
                 .addGap(47, 47, 47)
-                .addComponent(ScrollPane_3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(AppointmentHistory_ScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(58, 58, 58)
                 .addGroup(AppointmentHistoryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(RefreshButton)
@@ -525,10 +539,10 @@ public class PatientView extends javax.swing.JFrame {
         HospitalizationObservationsLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         HospitalizationObservationsLabel.setText("Observations");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
-        jTextArea1.setRows(5);
-        Hospitalization_ObservationsScrollPane.setViewportView(jTextArea1);
+        Hospitalization_ObservationsTextArea.setColumns(20);
+        Hospitalization_ObservationsTextArea.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
+        Hospitalization_ObservationsTextArea.setRows(5);
+        Hospitalization_ObservationsScrollPane.setViewportView(Hospitalization_ObservationsTextArea);
 
         CreateHospitalizationButton.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
         CreateHospitalizationButton.setText("Create");
@@ -547,10 +561,10 @@ public class PatientView extends javax.swing.JFrame {
         CancelAppointmentObservationLabel.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
         CancelAppointmentObservationLabel.setText("Observations");
 
-        jTextArea2.setColumns(20);
-        jTextArea2.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
-        jTextArea2.setRows(5);
-        Cancel_ObservationsScrollPane.setViewportView(jTextArea2);
+        Cancel_ObservationsTextArea.setColumns(20);
+        Cancel_ObservationsTextArea.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
+        Cancel_ObservationsTextArea.setRows(5);
+        Cancel_ObservationsScrollPane.setViewportView(Cancel_ObservationsTextArea);
 
         CancelButton.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
         CancelButton.setText("Cancel");
@@ -794,43 +808,16 @@ public class PatientView extends javax.swing.JFrame {
     }//GEN-LAST:event_ExitButtonPatientViewActionPerformed
 
     private void CancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CancelButtonActionPerformed
-        String idAppointment = IDAppointmentComboBox.getItemAt(IDAppointmentComboBox.getSelectedIndex());
-        for(Appointment ap: this.appointments){
-            if (ap.getId().equals(idAppointment)) {
-                ap.setStatus(AppointmentStatus.CANCELED);
-            }
-        }
+        String id = IDAppointmentComboBox.getSelectedItem().toString();
+        String observations = Cancel_ObservationsTextArea.getText();
+        Response response = patientController.cancelAppointment(id, observations);
+        JOptionPane.showMessageDialog(this, response.getMessage());
     }//GEN-LAST:event_CancelButtonActionPerformed
 
     private void SaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveButtonActionPerformed
-        String firstname = FirstnameTextField.getText();
-        String lastname = LastnameTextField.getText();
-        Boolean gender = (GenderComboBox.getSelectedIndex() == 0 ? null : (GenderComboBox.getSelectedIndex() == 1));
-        String birth = BirthdateTextField.getText();
-        String address = AdressTextField.getText();
-        long phone = Long.parseLong(PhoneTextField.getText());
-        String email = EmailTextField.getText();
-        String username = UserTextField.getText();
-        String password = PasswordTextField.getText();
-        String comPassword = PasswordConfirmTextField.getText();
-        LocalDate birthdate = LocalDate.of(Integer.parseInt(birth.substring(0, 4)), Integer.parseInt(birth.substring(5, 7)), Integer.parseInt(birth.substring(8)));
-        if (comPassword.equals(password)) {
-            for (User user : this.users) {
-                if (user.getId() == this.user.getId() && user instanceof Patient) {
-                    Patient userTemp = (Patient) user;
-                    userTemp.setAddress(address);
-                    userTemp.setBirthdate(birthdate);
-                    userTemp.setEmail(email);
-                    userTemp.setFirstname(firstname);
-                    userTemp.setGender(gender);
-                    userTemp.setLastname(lastname);
-                    userTemp.setPassword(password);
-                    userTemp.setPhone(phone);
-                    userTemp.setUsername(username);
-                }
-            }
-        }
-
+        Response response = patientController.updatePatient(patient.getId(), UserTextField.getText(), FirstnameTextField.getText(), LastnameTextField.getText(), PasswordTextField.getText(), PasswordConfirmTextField.getText(), EmailTextField.getText(), BirthdateTextField.getText(), GenderComboBox.getSelectedIndex() == 1, Long.parseLong(PhoneTextField.getText()), AdressTextField.getText());
+        JOptionPane.showMessageDialog(this, response.getMessage());
+        clearSaveForm();
     }//GEN-LAST:event_SaveButtonActionPerformed
 
     private void LogoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogoutButtonActionPerformed
@@ -848,7 +835,6 @@ public class PatientView extends javax.swing.JFrame {
         if (DoctorRadioButton.isSelected()) {
             DoctorRadioButton.setSelected(false);
         }
-
         RequestMedicalAppointmentComboBox.removeAllItems();
 
         RequestMedicalAppointmentComboBox.addItem("Select one");
@@ -872,47 +858,26 @@ public class PatientView extends javax.swing.JFrame {
     }//GEN-LAST:event_DoctorRadioButtonActionPerformed
 
     private void CreateMedicalAppointmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateMedicalAppointmentButtonActionPerformed
-        String appointDate = AppointmentDateTextField.getText();
-        LocalDate appointmentDate = LocalDate.of(Integer.parseInt(appointDate.substring(0, 4)), Integer.parseInt(appointDate.substring(5, 7)), Integer.parseInt(appointDate.substring(8)));
-        LocalTime appointmentHour = LocalTime.of(Integer.parseInt(AppointmentTimeTextField.getText().substring(0, 2)), Integer.parseInt(AppointmentTimeTextField.getText().substring(3)));
-        LocalDateTime Finally = LocalDateTime.of(appointmentDate, appointmentHour);
-        String appointmentReason = AppointmentReasonTextArea.getText();
-        long docId = Long.parseLong(RequestMedicalAppointmentComboBox.getItemAt(RequestMedicalAppointmentComboBox.getSelectedIndex()));
-        Doctor doctor = null;
-        for(User use:this.users){
-            if (use.getId() == docId) {
-                doctor = (Doctor) use;
-            }
-        }
-        Boolean appointmentType = (AppointmentTypeComboBox.getSelectedIndex() == 0 ? null : (AppointmentTypeComboBox.getSelectedIndex() == 2 ));
-        this.appointments.add(new Appointment(appointDate, patient, doctor, doctor.getSpecialty(), Finally, appointDate, appointmentType));
+        boolean isSpecialty = SpecialtyRadioButton.isSelected();
+        String selected = RequestMedicalAppointmentComboBox.getSelectedItem().toString();
+        Response response = patientController.createAppointment(AppointmentDateTextField.getText(), AppointmentTimeTextField.getText(), AppointmentReasonTextArea.getText(), isSpecialty, selected, (Patient) patient);
+        JOptionPane.showMessageDialog(this, response.getMessage());
     }//GEN-LAST:event_CreateMedicalAppointmentButtonActionPerformed
 
 
     private void RefreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RefreshButtonActionPerformed
-        // TODO add your handling code here:
-        Patient p = (Patient) user;
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) AppointmentHistory_Table.getModel();
         model.setRowCount(0);
-        for (Appointment a : p.getAppointments()) {
-            model.addRow(new Object[]{a.getId(), a.getDatetime().toString(), a.getDoctor().getFirstname() + " " + a.getDoctor().getLastname(), a.getSpecialty().name(), a.isType() ? "In-person" : "Remote", a.getStatus().name()});
+        for (Appointment a : patientController.getAppointments()) {
+            if (a.getPatient().getId() == patient.getId()) {
+                model.addRow(new Object[]{ a.getId(), a.getDatetime().toString(), a.getDoctor().getFirstname() + " " + a.getDoctor().getLastname(), a.getSpecialty() != null ? a.getSpecialty().name() : "-", a.isType() ? "In-person" : "Remote", a.getStatus().name() });
+            }
         }
     }//GEN-LAST:event_RefreshButtonActionPerformed
 
     private void CreateHospitalizationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateHospitalizationButtonActionPerformed
-        String hospitalizationReason = HospitalizationReasonTextArea.getText();
-        long idDoctor = Long.parseLong(AttendingDoctorComboBox.getItemAt(AttendingDoctorComboBox.getSelectedIndex()));
-        Doctor doc = null;
-        for(User use: this.users){
-            if (use.getId()  == idDoctor ){
-                doc = (Doctor) use;
-            }
-        }
-        LocalDate stimateDate = LocalDate.of(Integer.parseInt(EstimatedDateAdmissionTextField.getText().substring(0, 4)),Integer.parseInt(EstimatedDateAdmissionTextField.getText().substring(5, 7)), Integer.parseInt(EstimatedDateAdmissionTextField.getText().substring(8)));
-        
-        RoomType desireRoom = RoomType.valueOf(DesiredRoomTypeComboBox.getItemAt(DesiredRoomTypeComboBox.getSelectedIndex()).toUpperCase());
-        String observations = jTextArea1.getText();
-        this.hospitalizations.add(new Hospitalization(observations, this.patient, doc, stimateDate, observations, desireRoom, observations));
+        Response response = patientController.createHospitalization(HospitalizationReasonTextArea.getText(), AttendingDoctorComboBox.getSelectedItem().toString(), EstimatedDateAdmissionTextField.getText(), DesiredRoomTypeComboBox.getSelectedItem().toString(), Hospitalization_ObservationsTextArea.getText(), patient);
+        JOptionPane.showMessageDialog(this, response.getMessage());
     }//GEN-LAST:event_CreateHospitalizationButtonActionPerformed
 
     private void AppointmentTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AppointmentTypeComboBoxActionPerformed
@@ -927,6 +892,8 @@ public class PatientView extends javax.swing.JFrame {
     private javax.swing.JLabel AppointmentDateLabel;
     private javax.swing.JTextField AppointmentDateTextField;
     private javax.swing.JPanel AppointmentHistoryPanel;
+    private javax.swing.JScrollPane AppointmentHistory_ScrollPane;
+    private javax.swing.JTable AppointmentHistory_Table;
     private javax.swing.JLabel AppointmentReasonLabel;
     private javax.swing.JScrollPane AppointmentReasonScrollPane;
     private javax.swing.JTextArea AppointmentReasonTextArea;
@@ -943,6 +910,7 @@ public class PatientView extends javax.swing.JFrame {
     private javax.swing.JLabel CancelAppointmentObservationLabel;
     private javax.swing.JButton CancelButton;
     private javax.swing.JScrollPane Cancel_ObservationsScrollPane;
+    private javax.swing.JTextArea Cancel_ObservationsTextArea;
     private javax.swing.JButton CreateHospitalizationButton;
     private javax.swing.JButton CreateMedicalAppointmentButton;
     private javax.swing.JComboBox<String> DesiredRoomTypeComboBox;
@@ -962,6 +930,7 @@ public class PatientView extends javax.swing.JFrame {
     private javax.swing.JScrollPane HospitalizationReasonScrollPane;
     private javax.swing.JTextArea HospitalizationReasonTextArea;
     private javax.swing.JScrollPane Hospitalization_ObservationsScrollPane;
+    private javax.swing.JTextArea Hospitalization_ObservationsTextArea;
     private javax.swing.JComboBox<String> IDAppointmentComboBox;
     private javax.swing.JLabel IDAppointmentLabel;
     private javax.swing.JLabel LastnameLabel;
@@ -983,15 +952,11 @@ public class PatientView extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> RequestMedicalAppointmentComboBox;
     private javax.swing.JLabel RequestMedicalAppointmentLabel;
     private javax.swing.JButton SaveButton;
-    private javax.swing.JScrollPane ScrollPane_3;
     private javax.swing.JSeparator Separator_Hospitalization_Cancel;
     private javax.swing.JSeparator Separator_MedicalAppointment_Hospitalization;
     private javax.swing.JRadioButton SpecialtyRadioButton;
     private packagee.PanelRound SuperiorPanelRound;
     private javax.swing.JLabel UserLabel;
     private javax.swing.JTextField UserTextField;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextArea jTextArea2;
     // End of variables declaration//GEN-END:variables
 }
