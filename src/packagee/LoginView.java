@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 /**
@@ -30,8 +31,9 @@ public class LoginView extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         
         this.loginController = loginController;
-        this.users = new ArrayList<>();
-        this.users.add(new Administrator(0, "admin", "admin", "adnim", "admin123"));
+        this.users = loginController.getUsers();
+        this.appointments = loginController.getAppointments();
+        this.hospitalizations = loginController.getHospitalizations();
     }
 
     /**
@@ -417,30 +419,44 @@ public class LoginView extends javax.swing.JFrame {
 
     private void EnterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EnterButtonActionPerformed
         // TODO add your handling code here:
+        String username = UsernameTextField.getText();
+        String password = PasswordTextField.getText();
+
         User selectedUser = null;
+
         for (User user : this.users) {
-            if (UsernameTextField.getText().equals(user.getUsername())) {
+            if (username.equals(user.getUsername())) {
+            
                 selectedUser = user;
-                if (selectedUser.getPassword().equals(PasswordTextField.getText())) {
-                    if (selectedUser instanceof Administrator ) {
-                        AdminView admin = new AdminView(selectedUser,users,hospitalizations, appointments);
+            
+                if (password.equals(selectedUser.getPassword())) {
+                
+                    JOptionPane.showMessageDialog(this, "[✅] You have successfully logged in");
+                
+                    if (selectedUser instanceof Administrator) {
+                        AdminView admin = new AdminView(selectedUser, users, hospitalizations, appointments);
                         this.setVisible(false);
                         admin.setVisible(true);
                     }
-                    else if (selectedUser instanceof Doctor ) {
-                        DoctorView doctor = new DoctorView(selectedUser,(Doctor)selectedUser,users,hospitalizations,appointments);
+
+                    else if (selectedUser instanceof Doctor) {
+                        DoctorView doctor = new DoctorView(selectedUser, (Doctor) selectedUser, users, hospitalizations, appointments);
                         this.setVisible(false);
                         doctor.setVisible(true);
                     }
+
                     else {
-                        PatientView patient = new PatientView(selectedUser,(Patient) selectedUser,users,appointments, hospitalizations);
+                        PatientView patient = new PatientView(selectedUser, (Patient) selectedUser, users, appointments, hospitalizations);
                         this.setVisible(false);
                         patient.setVisible(true);
                     }
+                    return;
                 }
             }
         }
-
+    
+        //Mensaje de error
+        JOptionPane.showMessageDialog(this, "[⚠] Error: Incorrect username or password");
     }//GEN-LAST:event_EnterButtonActionPerformed
 
     private void SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveActionPerformed
@@ -469,28 +485,6 @@ public class LoginView extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        System.setProperty("flatlaf.useNativeLibrary", "false");
-
-        try {
-            UIManager.setLookAndFeel(new FlatDarkLaf());
-        } catch (Exception ex) {
-            System.err.println("Failed to initialize LaF");
-        }
-        
-        ArrayList<User> users = new ArrayList<>();
-        ArrayList<Appointment> appointments = new ArrayList<>();
-        ArrayList<Hospitalization> hospitalizations = new ArrayList<>();
-
-        LoginController loginController = new LoginController(users, appointments, hospitalizations);
-        
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new LoginView(loginController).setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel AdressLabel;

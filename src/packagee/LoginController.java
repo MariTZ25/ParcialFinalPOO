@@ -22,6 +22,18 @@ public class LoginController {
         this.hospitalizations = hospitalizations;
     }
     
+    public ArrayList<User> getUsers() {
+        return users;
+    }
+
+    public ArrayList<Appointment> getAppointments() {
+        return appointments;
+    }
+
+    public ArrayList<Hospitalization> getHospitalizations() {
+        return hospitalizations;
+    }
+    
     public Response login(String username, String password) {
 
         User user = HospitalData.findUserByUsername(username);

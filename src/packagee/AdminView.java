@@ -19,7 +19,6 @@ public class AdminView extends javax.swing.JFrame {
     private ArrayList<Appointment>appointments;
     private ArrayList<Hospitalization>hospitalizations;
     private User user;
-    private AdminController adminController;
     
     public AdminView(User user, ArrayList<User>users,ArrayList<Hospitalization> hospitalizations, ArrayList<Appointment> appointments) {
         initComponents();
@@ -27,14 +26,38 @@ public class AdminView extends javax.swing.JFrame {
         this.users = users;
         this.hospitalizations = hospitalizations;
         this.appointments = appointments;
+        
+        loadDoctors();
+        loadPatients();
+        
         this.setBackground(new Color(0, 0, 0, 0));
         this.setLocationRelativeTo(null);
     }
     
     private LoginController createLoginController() {
-        LoginController loginController = new LoginController(adminController.getUsers(), adminController.getAppointments(), adminController.getHospitalizations());
+        LoginController loginController = new LoginController(users, appointments, hospitalizations);
         return loginController;
     }
+    
+    private void loadDoctors() {
+        SelectDoctorComboBox.removeAllItems();
+        SelectDoctorComboBox.addItem("Select one");
+        for (User use : users) {
+            if (use instanceof Doctor) {
+                SelectDoctorComboBox.addItem(String.valueOf(use.getId()));
+            }
+        }
+    }
+
+    private void loadPatients() {
+        SelectPatientComboBox.removeAllItems();
+        SelectPatientComboBox.addItem("Select one");
+        for (User use : users) {
+            if (use instanceof Patient) {
+                SelectPatientComboBox.addItem(String.valueOf(use.getId()));
+            }
+        }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -437,7 +460,7 @@ public class AdminView extends javax.swing.JFrame {
         Doctor temp = null;
         for(User use:this.users){
             if(use.getId() == idDoctor)
-                temp =(Doctor) user;
+                temp = (Doctor) use;
         }
         DoctorView doctor = new DoctorView(user,temp, users, hospitalizations,appointments);
         this.setVisible(false);
@@ -450,11 +473,11 @@ public class AdminView extends javax.swing.JFrame {
     }//GEN-LAST:event_LogoutButtonActionPerformed
 
     private void PatientViewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PatientViewButtonActionPerformed
-        long idPatient = Long.parseLong(SelectDoctorComboBox.getItemAt(SelectDoctorComboBox.getSelectedIndex()));
+        long idPatient = Long.parseLong(SelectPatientComboBox.getItemAt(SelectPatientComboBox.getSelectedIndex()));
         Patient temp = null;
         for(User use:this.users){
             if(use.getId() == idPatient)
-                temp =(Patient) user;
+                temp = (Patient) use;
         }
         PatientView patient = new PatientView(user,temp,users,appointments,hospitalizations);
         this.setVisible(false);
