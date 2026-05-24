@@ -5,6 +5,11 @@
 package packagee;
 
 import java.time.LocalDate;
+import modelo.Doctor;
+import modelo.Hospitalization;
+import modelo.HospitalizationStatus;
+import modelo.Patient;
+import modelo.RoomType;
 /**
  *
  * @author Sahid

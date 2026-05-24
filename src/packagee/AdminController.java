@@ -5,9 +5,12 @@
 package packagee;
 
 import java.util.ArrayList;
-import static packagee.HospitalData.appointments;
-import static packagee.HospitalData.hospitalizations;
-import static packagee.HospitalData.users;
+import modelo.Appointment;
+import modelo.Doctor;
+import modelo.Hospitalization;
+import modelo.Patient;
+import modelo.Specialty;
+import modelo.User;
 
 /**
  *
@@ -15,6 +18,18 @@ import static packagee.HospitalData.users;
  */
 public class AdminController {
 
+    private ArrayList<User> users;
+    private ArrayList<Appointment> appointments;
+    private ArrayList<Hospitalization> hospitalizations;
+    
+    //Constructor
+    public AdminController(ArrayList<User> users, ArrayList<Appointment> appointments, ArrayList<Hospitalization> hospitalizations) {
+        this.users = users;
+        this.appointments = appointments;
+        this.hospitalizations = hospitalizations;
+    }
+    
+    //Getters
     public ArrayList<User> getUsers() { 
         return users;
     }
@@ -27,32 +42,73 @@ public class AdminController {
         return hospitalizations; 
     }
     
-    public Response registerDoctor(
-            long id,
-            String username,
-            String firstname,
-            String lastname,
-            String password,
-            String confirmPassword,
-            Specialty specialty,
-            String licenceNumber,
-            String assignedOffice
-    ) {
-        DoctorController doctorController = new DoctorController();
+    public Response registerDoctor(String firstname, String lastname, String idText, String spec, String licenseNumber, String assignedOffice, String username, String password, String comPassword) {
+        //Validations
+        if (firstname.trim().isEmpty() || lastname.trim().isEmpty() || idText.trim().isEmpty() || username.trim().isEmpty() || password.trim().isEmpty() || comPassword.trim().isEmpty()) {
+            return new Response(StatusCode.BAD_REQUEST, "Complete all required fields");
+        }
+        
+        long id;
+        try {
+            id = Long.parseLong(idText);
+        } catch (NumberFormatException e) {
+            return new Response(StatusCode.BAD_REQUEST, "ID must be numeric");
+        }
+        
+        if (spec.equals("Select one")) {
+            return new Response(StatusCode.BAD_REQUEST, "Select a specialty");
+        }
+        if (!password.equals(comPassword)) {
+            return new Response(StatusCode.BAD_REQUEST, "Passwords do not match");
+        }
 
-        return doctorController.registerDoctor(
-                id,
-                username,
-                firstname,
-                lastname,
-                password,
-                confirmPassword,
-                specialty,
-                licenceNumber,
-                assignedOffice
-        );
+        for (User u : users) {
+            if (u.getId() == id) {
+                return new Response(StatusCode.CONFLICT,"ID already exists");
+            }
+        }
+        //Successfully created
+        Specialty specialty = Specialty.fromDisplayName(spec);
+        users.add(new Doctor(id, username, firstname, lastname, password, specialty, licenseNumber, assignedOffice));
+        return new Response(StatusCode.CREATED, "Doctor registered successfully");
+    }  
+    
+    public Doctor findDoctorById(String idText) {
+        if (idText.equals("Select one")) {
+            return null;
+        }
+        long idDoctor;
+        try {
+            idDoctor = Long.parseLong(idText);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        for (User use : users) {
+            if (use instanceof Doctor && use.getId() == idDoctor) {
+                return (Doctor) use;
+            }
+        }
+        return null;
     }
-
+    
+    public Patient findPatientById(String idText) {
+        if (idText.equals("Select one")) {
+            return null;
+        }
+        long idPatient;
+        try {
+            idPatient = Long.parseLong(idText);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        for (User use : users) {
+            if (use instanceof Patient && use.getId() == idPatient) {
+                return (Patient) use;
+            }
+        }
+        return null;
+    }
+    
     public Response registerPatient(
             long id,
             String username,
@@ -66,6 +122,7 @@ public class AdminController {
             long phone,
             String address
     ) {
+        
         PatientController patientController = new PatientController();
 
         return patientController.registerPatient(

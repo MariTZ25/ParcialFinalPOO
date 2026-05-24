@@ -7,6 +7,12 @@ package packagee;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import modelo.Appointment;
+import modelo.AppointmentStatus;
+import modelo.Doctor;
+import modelo.Patient;
+import modelo.Prescription;
+import modelo.Specialty;
 /**
  *
  * @author Sahid

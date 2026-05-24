@@ -6,6 +6,13 @@ package packagee;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import modelo.Appointment;
+import modelo.Doctor;
+import modelo.Hospitalization;
+import modelo.Patient;
+import modelo.Specialty;
+import modelo.User;
 
 /**
  *
@@ -19,6 +26,7 @@ public class AdminView extends javax.swing.JFrame {
     private ArrayList<Appointment>appointments;
     private ArrayList<Hospitalization>hospitalizations;
     private User user;
+    private AdminController adminController;
     
     public AdminView(User user, ArrayList<User>users,ArrayList<Hospitalization> hospitalizations, ArrayList<Appointment> appointments) {
         initComponents();
@@ -26,6 +34,7 @@ public class AdminView extends javax.swing.JFrame {
         this.users = users;
         this.hospitalizations = hospitalizations;
         this.appointments = appointments;
+        this.adminController = new AdminController(users, appointments, hospitalizations);
         
         loadDoctors();
         loadPatients();
@@ -37,6 +46,18 @@ public class AdminView extends javax.swing.JFrame {
     private LoginController createLoginController() {
         LoginController loginController = new LoginController(users, appointments, hospitalizations);
         return loginController;
+    }
+    
+    private void showResponse(Response response) {
+        int messageType;
+
+        if (response.getCode() >= 200 && response.getCode() < 300) {
+            messageType = JOptionPane.INFORMATION_MESSAGE;
+        } else {
+            messageType = JOptionPane.ERROR_MESSAGE;
+        }
+
+        JOptionPane.showMessageDialog(this, response.getMessage(), "System Message", messageType);
     }
     
     private void loadDoctors() {
@@ -440,31 +461,38 @@ public class AdminView extends javax.swing.JFrame {
     }//GEN-LAST:event_ExitButtonAdminViewActionPerformed
 
     private void SaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveButtonActionPerformed
-        String firstname = FirstNameTextField.getText();
-        String lastname = LastnameTextField.getText();
-        long id = Long.parseLong(IDTextField.getText());
-        String spec = SpecialtyComboBox.getItemAt(SpecialtyComboBox.getSelectedIndex());
-        String licenseNumber = LicenseNumerTextField.getText();
-        String assignedOffice = AssignedOfficeTextField.getText();
-        String username = UserTextField.getText();
-        String password = PasswordTextField.getText();
-        String comPassword = PasswordConfirmTextField.getText();
-        Specialty specialty = Specialty.valueOf(spec.replaceAll(" &", "").replaceAll(" ", "_"));
-        if (password.equals(comPassword)) {
-            users.add(new Doctor(id, username, firstname, lastname, password, specialty, licenseNumber, assignedOffice));
+        Response response = adminController.registerDoctor(FirstNameTextField.getText(), LastnameTextField.getText(), IDTextField.getText(), SpecialtyComboBox.getItemAt(SpecialtyComboBox.getSelectedIndex()), LicenseNumerTextField.getText(), AssignedOfficeTextField.getText(), UserTextField.getText(), PasswordTextField.getText(), PasswordConfirmTextField.getText());
+
+        JOptionPane.showMessageDialog(this, response.getMessage());
+
+        if (response.isSuccess()) {
+            //Reload ComboBox & Clean Fields
+            loadDoctors();
+            FirstNameTextField.setText("");
+            LastnameTextField.setText("");
+            IDTextField.setText("");
+            LicenseNumerTextField.setText("");
+            AssignedOfficeTextField.setText("");
+            UserTextField.setText("");
+            PasswordTextField.setText("");
+            PasswordConfirmTextField.setText("");
+            SpecialtyComboBox.setSelectedIndex(0);
         }
     }//GEN-LAST:event_SaveButtonActionPerformed
 
     private void DoctorViewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DoctorViewButtonActionPerformed
-        long idDoctor = Long.parseLong(SelectDoctorComboBox.getItemAt(SelectDoctorComboBox.getSelectedIndex()));
-        Doctor temp = null;
-        for(User use:this.users){
-            if(use.getId() == idDoctor)
-                temp = (Doctor) use;
+        String selectedDoctor = SelectDoctorComboBox.getItemAt(SelectDoctorComboBox.getSelectedIndex());
+        Doctor doctor = adminController.findDoctorById(selectedDoctor);
+
+        if (doctor != null) {
+            DoctorView doctorView = new DoctorView(user, doctor, users, hospitalizations, appointments);
+            
+            this.setVisible(false);
+            doctorView.setVisible(true);
+            
+        } else {
+            JOptionPane.showMessageDialog(this, "[⚠] Error: Please select a valid doctor", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        DoctorView doctor = new DoctorView(user,temp, users, hospitalizations,appointments);
-        this.setVisible(false);
-        doctor.setVisible(true);
     }//GEN-LAST:event_DoctorViewButtonActionPerformed
 
     private void LogoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogoutButtonActionPerformed
@@ -473,15 +501,18 @@ public class AdminView extends javax.swing.JFrame {
     }//GEN-LAST:event_LogoutButtonActionPerformed
 
     private void PatientViewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PatientViewButtonActionPerformed
-        long idPatient = Long.parseLong(SelectPatientComboBox.getItemAt(SelectPatientComboBox.getSelectedIndex()));
-        Patient temp = null;
-        for(User use:this.users){
-            if(use.getId() == idPatient)
-                temp = (Patient) use;
+        String selectedPatient = SelectPatientComboBox.getItemAt(SelectPatientComboBox.getSelectedIndex());
+        Patient patient = adminController.findPatientById(selectedPatient);
+
+        if (patient != null) {
+            PatientView patientView = new PatientView(user, patient, users, appointments, hospitalizations);
+
+            this.setVisible(false);
+            patientView.setVisible(true);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "[⚠] Error: Please select a valid patient", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        PatientView patient = new PatientView(user,temp,users,appointments,hospitalizations);
-        this.setVisible(false);
-        patient.setVisible(true);
     }//GEN-LAST:event_PatientViewButtonActionPerformed
 
 

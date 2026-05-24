@@ -8,7 +8,19 @@ import java.awt.Color;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import modelo.Administrator;
+import modelo.Appointment;
+import modelo.AppointmentStatus;
+import modelo.Doctor;
+import modelo.Hospitalization;
+import modelo.HospitalizationStatus;
+import modelo.Patient;
+import modelo.Prescription;
+import modelo.RoomType;
+import modelo.Specialty;
+import modelo.User;
 
 /**
  *
@@ -24,12 +36,11 @@ public class DoctorView extends javax.swing.JFrame {
     private ArrayList<Appointment>appointments;
     private Doctor doctor;
     private Patient patient;
-    private DoctorController doctorController;
     
     public DoctorView(User user,Doctor doc, ArrayList<User> users,ArrayList<Hospitalization> hospitalizations,ArrayList<Appointment> appointments) {
         initComponents();
         this.user = user;
-        this.users =users;
+        this.users = users;
         this.doctor = doc;
         this.hospitalizations = hospitalizations;
         this.appointments = appointments;
@@ -42,7 +53,7 @@ public class DoctorView extends javax.swing.JFrame {
     }
     
     private LoginController createLoginController() {
-        LoginController loginController = new LoginController(doctorController.getUsers(), doctorController.getAppointments(), doctorController.getHospitalizations());
+        LoginController loginController = new LoginController(users, appointments, hospitalizations);
         return loginController;
     }
 
@@ -1130,7 +1141,7 @@ public class DoctorView extends javax.swing.JFrame {
     private void PendingAppointmentsRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PendingAppointmentsRadioButtonActionPerformed
         // TODO add your handling code here:
         TotalAppointmentsRadioButton.setSelected(false);
-        Doctor d = (Doctor) user;
+        Doctor d = doctor;
         DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
         model.setRowCount(0);
         for (Appointment a : d.getAppointments()) {
@@ -1224,7 +1235,7 @@ public class DoctorView extends javax.swing.JFrame {
     private void TotalAppointmentsRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TotalAppointmentsRadioButtonActionPerformed
         // TODO add your handling code here:
         PendingAppointmentsRadioButton.setSelected(false);
-        Doctor d = (Doctor) user;
+        Doctor d = doctor;
         DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
         model.setRowCount(0);
         for (Appointment a : d.getAppointments()) {

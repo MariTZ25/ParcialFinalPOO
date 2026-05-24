@@ -6,14 +6,20 @@ package packagee;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import static packagee.HospitalData.appointments;
-import static packagee.HospitalData.hospitalizations;
-import static packagee.HospitalData.users;
+import modelo.Appointment;
+import modelo.Hospitalization;
+import modelo.Patient;
+import modelo.User;
+
 /**
  *
  * @author Sahid
  */
 public class PatientController {
+    
+    private ArrayList<User> users;
+    private ArrayList<Appointment> appointments;
+    private ArrayList<Hospitalization> hospitalizations;
     
     public ArrayList<User> getUsers() { 
         return users;

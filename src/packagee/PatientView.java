@@ -10,6 +10,15 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
+import modelo.Administrator;
+import modelo.Appointment;
+import modelo.AppointmentStatus;
+import modelo.Doctor;
+import modelo.Hospitalization;
+import modelo.Patient;
+import modelo.RoomType;
+import modelo.Specialty;
+import modelo.User;
 
 /**
  *
@@ -796,7 +805,7 @@ public class PatientView extends javax.swing.JFrame {
     private void SaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveButtonActionPerformed
         String firstname = FirstnameTextField.getText();
         String lastname = LastnameTextField.getText();
-        boolean gender = (GenderComboBox.getSelectedIndex() == 0 ? null : (GenderComboBox.getSelectedIndex() == 1));
+        Boolean gender = (GenderComboBox.getSelectedIndex() == 0 ? null : (GenderComboBox.getSelectedIndex() == 1));
         String birth = BirthdateTextField.getText();
         String address = AdressTextField.getText();
         long phone = Long.parseLong(PhoneTextField.getText());
@@ -875,7 +884,7 @@ public class PatientView extends javax.swing.JFrame {
                 doctor = (Doctor) use;
             }
         }
-        boolean appointmentType = (AppointmentTypeComboBox.getSelectedIndex() == 0 ? null : (AppointmentTypeComboBox.getSelectedIndex() == 2 ));
+        Boolean appointmentType = (AppointmentTypeComboBox.getSelectedIndex() == 0 ? null : (AppointmentTypeComboBox.getSelectedIndex() == 2 ));
         this.appointments.add(new Appointment(appointDate, patient, doctor, doctor.getSpecialty(), Finally, appointDate, appointmentType));
     }//GEN-LAST:event_CreateMedicalAppointmentButtonActionPerformed
 
@@ -895,7 +904,7 @@ public class PatientView extends javax.swing.JFrame {
         long idDoctor = Long.parseLong(AttendingDoctorComboBox.getItemAt(AttendingDoctorComboBox.getSelectedIndex()));
         Doctor doc = null;
         for(User use: this.users){
-            if (use.id  == idDoctor ){
+            if (use.getId()  == idDoctor ){
                 doc = (Doctor) use;
             }
         }

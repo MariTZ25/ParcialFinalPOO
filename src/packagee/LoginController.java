@@ -5,6 +5,12 @@
 package packagee;
 
 import java.util.ArrayList;
+import modelo.Administrator;
+import modelo.Appointment;
+import modelo.Doctor;
+import modelo.Hospitalization;
+import modelo.Patient;
+import modelo.User;
 
 /**
  *

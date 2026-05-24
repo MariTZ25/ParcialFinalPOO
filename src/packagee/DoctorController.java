@@ -5,6 +5,11 @@
 package packagee;
 
 import java.util.ArrayList;
+import modelo.Appointment;
+import modelo.Doctor;
+import modelo.Hospitalization;
+import modelo.Specialty;
+import modelo.User;
 import static packagee.HospitalData.appointments;
 import static packagee.HospitalData.hospitalizations;
 import static packagee.HospitalData.users;
@@ -14,6 +19,7 @@ import static packagee.HospitalData.users;
  * @author Sahid
  */
 public class DoctorController {
+    
     public ArrayList<User> getUsers() { 
         return users;
     }

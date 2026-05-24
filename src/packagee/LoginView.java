@@ -4,13 +4,16 @@
  */
 package packagee;
 
-import com.formdev.flatlaf.FlatDarkLaf;
 import java.awt.Color;
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
+import modelo.Administrator;
+import modelo.Appointment;
+import modelo.Doctor;
+import modelo.Hospitalization;
+import modelo.Patient;
+import modelo.User;
 
 /**
  *

@@ -8,6 +8,13 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.UIManager;
+import modelo.Administrator;
+import modelo.Appointment;
+import modelo.Doctor;
+import modelo.Hospitalization;
+import modelo.Patient;
+import modelo.Specialty;
+import modelo.User;
 
 /**
  *
