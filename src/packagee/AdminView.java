@@ -19,6 +19,8 @@ public class AdminView extends javax.swing.JFrame {
     private ArrayList<Appointment>appointments;
     private ArrayList<Hospitalization>hospitalizations;
     private User user;
+    private AdminController adminController;
+    
     public AdminView(User user, ArrayList<User>users,ArrayList<Hospitalization> hospitalizations, ArrayList<Appointment> appointments) {
         initComponents();
         this.user = user;
@@ -27,6 +29,11 @@ public class AdminView extends javax.swing.JFrame {
         this.appointments = appointments;
         this.setBackground(new Color(0, 0, 0, 0));
         this.setLocationRelativeTo(null);
+    }
+    
+    private LoginController createLoginController() {
+        LoginController loginController = new LoginController(adminController.getUsers(), adminController.getAppointments(), adminController.getHospitalizations());
+        return loginController;
     }
 
     /**
@@ -438,10 +445,8 @@ public class AdminView extends javax.swing.JFrame {
     }//GEN-LAST:event_DoctorViewButtonActionPerformed
 
     private void LogoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogoutButtonActionPerformed
-        
-        LoginView login = new LoginView();
         this.setVisible(false);
-        login.setVisible(true);
+        new LoginView(createLoginController()).setVisible(true);
     }//GEN-LAST:event_LogoutButtonActionPerformed
 
     private void PatientViewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PatientViewButtonActionPerformed
