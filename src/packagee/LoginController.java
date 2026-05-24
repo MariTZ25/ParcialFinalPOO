@@ -4,6 +4,7 @@
  */
 package packagee;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import modelo.Administrator;
 import modelo.Appointment;
@@ -42,52 +43,80 @@ public class LoginController {
     
     public Response login(String username, String password) {
 
-        User user = HospitalData.findUserByUsername(username);
-
-        if (user == null) {
-            return new Response(
-                    StatusCode.NOT_FOUND,
-                    "Usuario no encontrado"
-            );
+        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+            return new Response(StatusCode.BAD_REQUEST, "Complete all fields");
         }
 
-        if (!user.getPassword().equals(password)) {
-            return new Response(
-                    StatusCode.BAD_REQUEST,
-                    "Contraseña incorrecta"
-            );
+        for (User user : users) {
+            if (username.equals(user.getUsername())) {
+                if (!password.equals(user.getPassword())) {
+                    return new Response(StatusCode.BAD_REQUEST, "Incorrect password");
+                }
+
+                String role;
+
+                if (user instanceof Administrator) {
+                    role = "ADMIN";
+                } else if (user instanceof Doctor) {
+                    role = "DOCTOR";
+                } else {
+                    role = "PATIENT";
+                }
+
+                return new Response(StatusCode.OK, "Login successful", role + ";" + user.getUsername());
+            }
         }
 
-        if (user instanceof Administrator) {
-
-            return new Response(
-                    StatusCode.OK,
-                    "Login administrador exitoso",
-                    "ADMIN"
-            );
+        return new Response(StatusCode.NOT_FOUND, "User not found");
+    }
+    
+    public Response registerPatient(String idText, String username, String firstname, String lastname, String password, String confirmPassword, String email, String birthdateText, String genderText, String phoneText, String address) {
+        if (firstname.trim().isEmpty() || lastname.trim().isEmpty()
+                || username.trim().isEmpty() || password.trim().isEmpty()) {
+            return new Response(StatusCode.BAD_REQUEST, "Complete all fields");
         }
 
-        if (user instanceof Patient) {
+        if (!password.equals(confirmPassword)) {
+            return new Response(StatusCode.BAD_REQUEST, "Passwords do not match");
+        }
+        long id;
+        long phone;
 
-            return new Response(
-                    StatusCode.OK,
-                    "Login paciente exitoso",
-                    "PATIENT"
-            );
+        try {
+            id = Long.parseLong(idText);
+            phone = Long.parseLong(phoneText);
+        } catch (NumberFormatException e) {
+            return new Response(StatusCode.BAD_REQUEST, "ID or phone must be numeric");
         }
 
-        if (user instanceof Doctor) {
-
-            return new Response(
-                    StatusCode.OK,
-                    "Login doctor exitoso",
-                    "DOCTOR"
-            );
+        boolean gender;
+        if (genderText.equals("Female")) {
+            gender = false;
+        } else if (genderText.equals("Male")) {
+            gender = true;
+        } else {
+            return new Response(StatusCode.BAD_REQUEST, "Select gender");
         }
 
-        return new Response(
-                StatusCode.BAD_REQUEST,
-                "Tipo de usuario inválido"
-        );
+        LocalDate birthdate;
+        try {
+            birthdate = LocalDate.parse(birthdateText);
+        } catch (Exception e) {
+            return new Response(StatusCode.BAD_REQUEST, "Invalid birthdate format (YYYY-MM-DD)");
+        }
+
+        users.add(new Patient(id, username, firstname, lastname, password,
+                email, birthdate, gender, phone, address));
+
+        return new Response(StatusCode.CREATED, "Patient registered successfully");
+    }
+    
+    public User getUserByUsername(String username) {
+        for (User u : users) {
+            if (u.getUsername().equals(username)) {
+                return u;
+            }
+        }
+        return null;
     }
 }

@@ -12,6 +12,7 @@ public class Response {
     private int code;
     private String message;
     private String data;
+    private String extraData;
 
     public Response(int code, String message) {
         this.code = code;

@@ -38,6 +38,20 @@ public class LoginView extends javax.swing.JFrame {
         this.appointments = loginController.getAppointments();
         this.hospitalizations = loginController.getHospitalizations();
     }
+    
+    private void clearPatientForm() {
+        FirstnameTextField.setText("");
+        LastnameTextField.setText("");
+        IDTextField.setText("");
+        PhoneTextField.setText("");
+        EmailTextField.setText("");
+        UserTextField.setText("");
+        PatientRegister_PasswordTextField.setText("");
+        PatientRegister_PasswordConfirmTextField.setText("");
+        AdressTextField.setText("");
+        jTextField12.setText("");
+        GenderComboBox.setSelectedIndex(0);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -421,64 +435,42 @@ public class LoginView extends javax.swing.JFrame {
     }//GEN-LAST:event_ExitButtonActionPerformed
 
     private void EnterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EnterButtonActionPerformed
-        // TODO add your handling code here:
-        String username = UsernameTextField.getText();
-        String password = PasswordTextField.getText();
+        Response response = loginController.login(UsernameTextField.getText(), PasswordTextField.getText());
 
-        User selectedUser = null;
+        JOptionPane.showMessageDialog(this, response.getMessage());
 
-        for (User user : this.users) {
-            if (username.equals(user.getUsername())) {
-            
-                selectedUser = user;
-            
-                if (password.equals(selectedUser.getPassword())) {
-                
-                    JOptionPane.showMessageDialog(this, "[✅] You have successfully logged in");
-                
-                    if (selectedUser instanceof Administrator) {
-                        AdminView admin = new AdminView(selectedUser, users, hospitalizations, appointments);
-                        this.setVisible(false);
-                        admin.setVisible(true);
-                    }
-
-                    else if (selectedUser instanceof Doctor) {
-                        DoctorView doctor = new DoctorView(selectedUser, (Doctor) selectedUser, users, hospitalizations, appointments);
-                        this.setVisible(false);
-                        doctor.setVisible(true);
-                    }
-
-                    else {
-                        PatientView patient = new PatientView(selectedUser, (Patient) selectedUser, users, appointments, hospitalizations);
-                        this.setVisible(false);
-                        patient.setVisible(true);
-                    }
-                    return;
-                }
-            }
+        if (!response.isSuccess()) {
+            return;
         }
-    
-        //Mensaje de error
-        JOptionPane.showMessageDialog(this, "[⚠] Error: Incorrect username or password");
+
+        String[] data = response.getData().split(";");
+        String role = data[0];
+        String username = data[1];
+
+        User user = loginController.getUserByUsername(username);
+        this.setVisible(false);
+
+        if (role.equals("ADMIN")) {
+            new AdminView(user,loginController.getUsers(),loginController.getHospitalizations(),loginController.getAppointments()).setVisible(true);
+        }
+
+        if (role.equals("DOCTOR")) {
+            new DoctorView(user, (Doctor) user, loginController.getUsers(), loginController.getHospitalizations(), loginController.getAppointments()).setVisible(true);
+        }
+
+        if (role.equals("PATIENT")) {
+            new PatientView(user, (Patient) user, loginController.getUsers(), loginController.getAppointments(), loginController.getHospitalizations()).setVisible(true);
+        }
     }//GEN-LAST:event_EnterButtonActionPerformed
 
     private void SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveActionPerformed
-        String firstname = FirstnameTextField.getText();
-        String lastname = LastnameTextField.getText();
-        long id = Long.parseLong(IDTextField.getText());
-        boolean gender = (GenderComboBox.getSelectedIndex() == 0 ? null : (GenderComboBox.getSelectedIndex() == 1 ));
-        String birth = jTextField12.getText();
-        String address = AdressTextField.getText();
-        long phone = Long.parseLong(PhoneTextField.getText());
-        String email = EmailTextField.getText();
-        String user = UserTextField.getText();
-        String password = PatientRegister_PasswordTextField.getText();
-        String comPassword = PatientRegister_PasswordConfirmTextField.getText();
-        LocalDate birthdate = LocalDate.of(Integer.parseInt(birth.substring(0, 4)), Integer.parseInt(birth.substring(5, 7)), Integer.parseInt(birth.substring(8)));
-        if (comPassword.equals(password)) {
-            users.add(new Patient(id, user, firstname, lastname, password, email, birthdate, gender, phone, address));
+        Response response = loginController.registerPatient(IDTextField.getText(), UserTextField.getText(), FirstnameTextField.getText(), LastnameTextField.getText(), PatientRegister_PasswordTextField.getText(), PatientRegister_PasswordConfirmTextField.getText(), EmailTextField.getText(), jTextField12.getText(), (String) GenderComboBox.getSelectedItem(), PhoneTextField.getText(), AdressTextField.getText());
+
+        JOptionPane.showMessageDialog(this, response.getMessage());
+
+        if (response.getCode() == StatusCode.CREATED) {
+            clearPatientForm();
         }
-        
     }//GEN-LAST:event_SaveActionPerformed
 
     private void PatientRegister_PasswordConfirmTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PatientRegister_PasswordConfirmTextFieldActionPerformed

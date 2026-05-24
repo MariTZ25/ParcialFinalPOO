@@ -37,7 +37,7 @@ public class DoctorView extends javax.swing.JFrame {
     private Doctor doctor;
     private Patient patient;
     
-    public DoctorView(User user,Doctor doc, ArrayList<User> users,ArrayList<Hospitalization> hospitalizations,ArrayList<Appointment> appointments) {
+    public DoctorView(User user, Doctor doc, ArrayList<User> users,ArrayList<Hospitalization> hospitalizations,ArrayList<Appointment> appointments) {
         initComponents();
         this.user = user;
         this.users = users;
