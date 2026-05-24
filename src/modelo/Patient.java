@@ -2,10 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package packagee;
+package modelo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import org.json.JSONObject;
 
 /**
  *
@@ -62,5 +63,45 @@ public class Patient extends User {
         this.address = address;
         this.appointments = new ArrayList<>();
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public LocalDate getBirthdate() {
+        return birthdate;
+    }
+
+    public boolean isGender() {
+        return gender;
+    }
+
+    public long getPhone() {
+        return phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public Hospitalization getHospitalization() {
+        return hospitalization;
+    }
+
+
+    
+    @Override
+    public JSONObject toJSON() {
+
+        JSONObject obj = super.toJSON();
+
+        obj.put("email", email);
+        obj.put("birthdate", birthdate.toString());
+        obj.put("gender", gender);
+        obj.put("phone", phone);
+        obj.put("address", address);
+
+        return obj;
+    }    
     
 }

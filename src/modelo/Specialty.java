@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Enum.java to edit this template
  */
-package packagee;
+package modelo;
 
 /**
  *
@@ -16,10 +16,13 @@ public enum Specialty {
     NEUROLOGY,
     TRAUMATOLOGY_ORTHOPEDICS,
     GYNECOLOGY_OBSTETRICS,
+    GYNECOLOGY,
     DERMATOLOGY,
     PSYCHIATRY,
     ONCOLOGY,
+    ORTHOPEDICS,
     OPHTHALMOLOGY,
     INTERNAL_MEDICINE
     
 }
+//Este fue el enum al que le faltaban dos especialidades: GYNECOLOGY Y ORTHOPEDICS
