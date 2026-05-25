@@ -84,8 +84,8 @@ public class Appointment {
         this.prescriptions = prescriptions;
     }
     
-    ///////
-        public Appointment(String id, Patient patient, Doctor doctor, Specialty specialty, LocalDateTime datetime, String reason, boolean type) {
+    
+    public Appointment(String id, Patient patient, Doctor doctor, Specialty specialty, LocalDateTime datetime, String reason, boolean type) {
         this.id = id;
         this.patient = patient;
         this.doctor = doctor;
@@ -104,7 +104,6 @@ public class Appointment {
         }
         
     }
-    ////////
 
     public String getId() {
         return id;

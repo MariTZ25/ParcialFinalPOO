@@ -119,11 +119,11 @@ public class AdminController {
             String email,
             String birthdate,
             boolean gender,
-            long phone,
+            String phoneText,
             String address
     ) {
         
-        PatientController patientController = new PatientController();
+        PatientController patientController = new PatientController(users, appointments, hospitalizations);
 
         return patientController.registerPatient(
                 id,
@@ -135,7 +135,7 @@ public class AdminController {
                 email,
                 birthdate,
                 gender,
-                phone,
+                phoneText,
                 address
         );
     }

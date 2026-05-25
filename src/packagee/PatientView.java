@@ -35,14 +35,17 @@ public class PatientView extends javax.swing.JFrame {
     private ArrayList<Appointment> appointments;
     private ArrayList<Hospitalization> hospitalizations;
     private PatientController patientController;
+    private HospitalizationController hospitalizationController;
 
-    public PatientView(User user,Patient patient, ArrayList<User> users, ArrayList<Appointment>appointments, ArrayList<Hospitalization> hospitalizations) {
+    public PatientView(User user, Patient patient, ArrayList<User> users, ArrayList<Appointment>appointments, ArrayList<Hospitalization> hospitalizations) {
         initComponents();
         this.user = user;
         this.users = users;
         this.patient = patient;
         this.hospitalizations = hospitalizations;
         this.appointments = appointments;
+        this.patientController = new PatientController(users, appointments, hospitalizations);
+        hospitalizationController = new HospitalizationController();
         if (user instanceof Administrator) {
             BackButton.setVisible(true);
         } else {
@@ -68,6 +71,53 @@ public class PatientView extends javax.swing.JFrame {
         PhoneTextField.setText("");
         AdressTextField.setText("");
         GenderComboBox.setSelectedIndex(0);
+    }
+    
+    private void loadDoctors() {
+        AttendingDoctorComboBox.removeAllItems();
+        AttendingDoctorComboBox.addItem("Select one");
+
+        for (String doctor : patientController.getDoctors()) {
+            AttendingDoctorComboBox.addItem(doctor);
+        }
+    }
+
+    private void loadRoomTypes() {
+        DesiredRoomTypeComboBox.removeAllItems();
+        
+        for (RoomType room : RoomType.values()) {
+            DesiredRoomTypeComboBox.addItem(room.toString());
+        }
+    }
+
+    private void loadAppointmentsToCancel() {
+        IDAppointmentComboBox.removeAllItems();
+        IDAppointmentComboBox.addItem("Select one");
+        
+        for (Appointment appointment : appointments) {
+            if (appointment.getPatient().equals(patient)) {
+                if (appointment.getStatus() != AppointmentStatus.CANCELED) {
+                    IDAppointmentComboBox.addItem(appointment.getId());
+                }
+            }
+        }
+    }
+
+    private void loadAppointmentHistory() {
+        DefaultTableModel model =(DefaultTableModel) AppointmentHistory_Table.getModel();
+        model.setRowCount(0);
+        for (Object[] row : patientController.getPatientAppointments(patient)) {
+            model.addRow(row);
+        }
+    }
+
+    private void loadPatientData() {
+        UserTextField.setText(patient.getUsername());
+        FirstnameTextField.setText(patient.getFirstname());
+        LastnameTextField.setText(patient.getLastname());
+        EmailTextField.setText(patient.getEmail());
+        PhoneTextField.setText(String.valueOf(patient.getPhone()));
+        AdressTextField.setText(patient.getAddress());
     }
 
     /**
@@ -836,10 +886,9 @@ public class PatientView extends javax.swing.JFrame {
             DoctorRadioButton.setSelected(false);
         }
         RequestMedicalAppointmentComboBox.removeAllItems();
-
         RequestMedicalAppointmentComboBox.addItem("Select one");
-        for (Specialty spec : Specialty.values()) {
-            RequestMedicalAppointmentComboBox.addItem(spec.toString().replaceAll("_", " & "));
+        for (String specialty : patientController.getSpecialties()) {
+            RequestMedicalAppointmentComboBox.addItem(specialty);
         }
     }//GEN-LAST:event_SpecialtyRadioButtonActionPerformed
 
@@ -848,19 +897,17 @@ public class PatientView extends javax.swing.JFrame {
             SpecialtyRadioButton.setSelected(false);
         }
         RequestMedicalAppointmentComboBox.removeAllItems();
-
         RequestMedicalAppointmentComboBox.addItem("Select one");
-        for (User doc : this.users) {
-            if (doc instanceof Doctor) {
-                RequestMedicalAppointmentComboBox.addItem(doc.getFirstname() + " " + doc.getLastname());
-            }
+        for (String doctor : patientController.getDoctors()) {
+            RequestMedicalAppointmentComboBox.addItem(doctor);
         }
     }//GEN-LAST:event_DoctorRadioButtonActionPerformed
 
     private void CreateMedicalAppointmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateMedicalAppointmentButtonActionPerformed
         boolean isSpecialty = SpecialtyRadioButton.isSelected();
         String selected = RequestMedicalAppointmentComboBox.getSelectedItem().toString();
-        Response response = patientController.createAppointment(AppointmentDateTextField.getText(), AppointmentTimeTextField.getText(), AppointmentReasonTextArea.getText(), isSpecialty, selected, (Patient) patient);
+        boolean type = AppointmentTypeComboBox.getSelectedItem().equals("In-person");
+        Response response = patientController.createAppointment(AppointmentDateTextField.getText(), AppointmentTimeTextField.getText(), AppointmentReasonTextArea.getText(), isSpecialty, selected, type, (Patient) patient);
         JOptionPane.showMessageDialog(this, response.getMessage());
     }//GEN-LAST:event_CreateMedicalAppointmentButtonActionPerformed
 
@@ -868,15 +915,13 @@ public class PatientView extends javax.swing.JFrame {
     private void RefreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RefreshButtonActionPerformed
         DefaultTableModel model = (DefaultTableModel) AppointmentHistory_Table.getModel();
         model.setRowCount(0);
-        for (Appointment a : patientController.getAppointments()) {
-            if (a.getPatient().getId() == patient.getId()) {
-                model.addRow(new Object[]{ a.getId(), a.getDatetime().toString(), a.getDoctor().getFirstname() + " " + a.getDoctor().getLastname(), a.getSpecialty() != null ? a.getSpecialty().name() : "-", a.isType() ? "In-person" : "Remote", a.getStatus().name() });
-            }
+        for (Object[] row : patientController.getPatientAppointments(patient)) {
+            model.addRow(row);
         }
     }//GEN-LAST:event_RefreshButtonActionPerformed
 
     private void CreateHospitalizationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateHospitalizationButtonActionPerformed
-        Response response = patientController.createHospitalization(HospitalizationReasonTextArea.getText(), AttendingDoctorComboBox.getSelectedItem().toString(), EstimatedDateAdmissionTextField.getText(), DesiredRoomTypeComboBox.getSelectedItem().toString(), Hospitalization_ObservationsTextArea.getText(), patient);
+        Response response = hospitalizationController.requestHospitalization(patient.getId(), AttendingDoctorComboBox.getSelectedItem().toString(), EstimatedDateAdmissionTextField.getText(), HospitalizationReasonTextArea.getText(), RoomType.valueOf(DesiredRoomTypeComboBox.getSelectedItem().toString().replace(" ", "_").toUpperCase()), Hospitalization_ObservationsTextArea.getText());
         JOptionPane.showMessageDialog(this, response.getMessage());
     }//GEN-LAST:event_CreateHospitalizationButtonActionPerformed
 

@@ -66,6 +66,7 @@ public class DoctorView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        HospitalizationRadioButtons = new javax.swing.ButtonGroup();
         LayoutPanelRound = new packagee.PanelRound();
         SuperiorPanelRound = new packagee.PanelRound();
         ExitButtonDoctorView = new javax.swing.JButton();
@@ -637,9 +638,11 @@ public class DoctorView extends javax.swing.JFrame {
         RequestsComboBox.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
         RequestsComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select one" }));
 
+        HospitalizationRadioButtons.add(RequestsRadioButton);
         RequestsRadioButton.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
         RequestsRadioButton.setText("Requests");
 
+        HospitalizationRadioButtons.add(PatientIDRadioButton);
         PatientIDRadioButton.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
         PatientIDRadioButton.setText("Patient ID");
 
@@ -1358,6 +1361,7 @@ public class DoctorView extends javax.swing.JFrame {
     private javax.swing.JPanel HistoryAppointmentsPatientPanel;
     private javax.swing.JScrollPane HistoryAppointmentsPatientScrollPane;
     private javax.swing.JLabel HospitalizationLabel;
+    private javax.swing.ButtonGroup HospitalizationRadioButtons;
     private javax.swing.JLabel Hospitalization_ObservationsLabel;
     private javax.swing.JScrollPane Hospitalization_ObservationsScrollPane;
     private javax.swing.JTextArea Hospitalization_ObservationsTextArea;

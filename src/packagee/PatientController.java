@@ -26,7 +26,13 @@ public class PatientController {
     private ArrayList<User> users;
     private ArrayList<Appointment> appointments;
     private ArrayList<Hospitalization> hospitalizations;
-    
+
+    public PatientController(ArrayList<User> users, ArrayList<Appointment> appointments, ArrayList<Hospitalization> hospitalizations) {
+        this.users = users;
+        this.appointments = appointments;
+        this.hospitalizations = hospitalizations;
+    }
+     
     public ArrayList<User> getUsers() { 
         return users;
     }
@@ -39,7 +45,7 @@ public class PatientController {
         return hospitalizations; 
     }
     
-    public Response createAppointment(String dateText, String timeText, String reason, boolean isSpecialtyMode, String selectedValue, Patient patient) {
+    public Response createAppointment(String dateText, String timeText, String reason, boolean isSpecialtyMode, String selectedValue, boolean type, Patient patient) {
         LocalDate date;
         LocalTime time;
 
@@ -48,6 +54,13 @@ public class PatientController {
             time = LocalTime.of(Integer.parseInt(timeText.substring(0, 2)), Integer.parseInt(timeText.substring(3)));
         } catch (Exception e) {
             return new Response(StatusCode.BAD_REQUEST, "Fecha u hora inválida");
+        }
+        
+        //Verify 0, 15, 30, 45
+        int minutes = time.getMinute();
+
+        if (minutes != 0 && minutes != 15 && minutes != 30 && minutes != 45) {
+            return new Response(StatusCode.BAD_REQUEST, "Los minutos deben ser 00, 15, 30 o 45");
         }
 
         LocalDateTime dateTime = LocalDateTime.of(date, time);
@@ -61,12 +74,26 @@ public class PatientController {
             } catch (Exception e) {
                 return new Response(StatusCode.BAD_REQUEST, "Especialidad inválida");
             }
-            
+
+            for (User u : users) {
+                if (u instanceof Doctor) {
+                    Doctor d = (Doctor) u;
+                    if (d.getSpecialty() == specialty && doctorAvailable(d, dateTime)) {
+                        doctor = d;
+                        break;
+                    }
+                }
+            }
+
+            if (doctor == null) {
+                return new Response(StatusCode.CONFLICT, "No hay doctores disponibles");
+            }
+
         } else {
             for (User u : users) {
-                if (u instanceof Doctor &&
-                    (u.getFirstname() + " " + u.getLastname()).equals(selectedValue)) {
+                if (u instanceof Doctor && (u.getFirstname() + " " + u.getLastname()).equals(selectedValue)) {
                     doctor = (Doctor) u;
+                    specialty = doctor.getSpecialty();
                     break;
                 }
             }
@@ -74,18 +101,37 @@ public class PatientController {
             if (doctor == null) {
                 return new Response(StatusCode.NOT_FOUND, "Doctor no encontrado");
             }
-        }
 
-        Appointment ap = new Appointment(reason, patient, doctor, specialty, dateTime, reason, false);
+            if (!doctorAvailable(doctor, dateTime)) {
+                return new Response(StatusCode.CONFLICT, "El doctor no tiene disponibilidad");
+            }
+        }
+        
+        String id = generateAppointmentId(patient);
+
+        Appointment ap = new Appointment(id, patient, doctor, specialty, dateTime, reason, type);
         appointments.add(ap);
 
         return new Response(StatusCode.CREATED, "Cita creada correctamente");
+    }
+    
+    private String generateAppointmentId(Patient patient) {
+        int count = 0;
+        for (Appointment ap : appointments) {
+            if (ap.getPatient().getId() == patient.getId()) {
+                count++;
+            }
+        }
+        return "A-" + patient.getId() + "-" + String.format("%04d", count);
     }
     
     public Response cancelAppointment(String appointmentId, String observations) {
 
         for (Appointment ap : appointments) {
             if (ap.getId().equals(appointmentId)) {
+                if (ap.getStatus() == AppointmentStatus.COMPLETED) {
+                    return new Response(StatusCode.BAD_REQUEST, "No se puede cancelar una cita completada");
+                }
                 ap.setStatus(AppointmentStatus.CANCELED);
                 return new Response(StatusCode.OK, "Cita cancelada");
             }
@@ -93,7 +139,7 @@ public class PatientController {
         return new Response(StatusCode.NOT_FOUND, "Cita no encontrada");
     }
     
-    public Response registerPatient(long id, String username,String firstname, String lastname, String password, String confirmPassword, String email, String birthdate, boolean gender, long phone, String address) {
+    public Response registerPatient(long id, String username,String firstname, String lastname, String password, String confirmPassword, String email, String birthdate, boolean gender, String phoneText, String address) {
         if (id <= 0 || String.valueOf(id).length() != 12) {
             return new Response(StatusCode.BAD_REQUEST, "El ID debe ser mayor que 0 y tener 12 dígitos");
         }
@@ -114,6 +160,13 @@ public class PatientController {
             return new Response(StatusCode.BAD_REQUEST, "Email inválido");
         }
 
+        long phone;
+        try {
+            phone = Long.parseLong(phoneText);
+        } catch (Exception e) {
+            return new Response(StatusCode.BAD_REQUEST,"El teléfono solo debe contener números");
+        }
+        
         if (String.valueOf(phone).length() != 10) {
             return new Response(StatusCode.BAD_REQUEST, "El teléfono debe tener 10 dígitos");
         }
@@ -132,76 +185,70 @@ public class PatientController {
         return new Response(StatusCode.CREATED, "Paciente registrado correctamente");
     }
 
-    public Response createHospitalization(String reason, String doctorSelected, String dateText, String roomTypeText, String observations, Patient patient) {
-        Doctor doctor = null;
-        for (User u : users) {
-            if (u instanceof Doctor &&
-                (u.getFirstname() + " " + u.getLastname()).equals(doctorSelected)) {
-                doctor = (Doctor) u;
-                break;
+    public ArrayList<Object[]> getPatientAppointments(Patient patient) {
+        ArrayList<Object[]> rows = new ArrayList<>();
+        for (Appointment a : appointments) {
+            if (a.getPatient().getId() == patient.getId()) {
+                String doctorName = "-";
+                if (a.getDoctor() != null) {
+                    doctorName = a.getDoctor().getFirstname() + " " + a.getDoctor().getLastname();
+                }
+                String specialty = "-";
+                if (a.getSpecialty() != null) {
+                    specialty = a.getSpecialty().name();
+                }
+                rows.add(new Object[]{a.getId(), a.getDatetime().toString(), doctorName, specialty, a.isType() ? "In-person" : "Remote", a.getStatus().name()});
             }
         }
-        if (doctor == null) {
-            return new Response(StatusCode.NOT_FOUND, "Doctor no encontrado");
-        }
-        LocalDate date;
-        try {
-            date = LocalDate.of(Integer.parseInt(dateText.substring(0, 4)), Integer.parseInt(dateText.substring(5, 7)), Integer.parseInt(dateText.substring(8)));
-        } catch (Exception e) {
-            return new Response(StatusCode.BAD_REQUEST, "Fecha inválida");
-        }
-        RoomType roomType;
-        try {
-            roomType = RoomType.valueOf(roomTypeText.toUpperCase());
-        } catch (Exception e) {
-            return new Response(StatusCode.BAD_REQUEST, "Tipo de habitación inválido");
-        }
-        
-        Hospitalization h = new Hospitalization(observations, patient, doctor, date, reason, roomType,observations);
-        hospitalizations.add(h);
-        return new Response(StatusCode.CREATED, "Hospitalización creada");
+        //Sort most recents
+        rows.sort((a, b) -> ((String) b[1]).compareTo((String) a[1]));
+        return rows;
     }
        
-    public Response updatePatient(
-            long id,
-            String username,
-            String firstname,
-            String lastname,
-            String password,
-            String confirmPassword,
-            String email,
-            String birthdate,
-            boolean gender,
-            long phone,
-            String address
-    ) {
-
+    public ArrayList<String> getSpecialties() {
+        ArrayList<String> specialties = new ArrayList<>();
+        for (Specialty spec : Specialty.values()) {
+            specialties.add(spec.toString().replaceAll("_", " & "));
+        }
+        return specialties;
+    }
+    
+    public ArrayList<String> getDoctors() {
+        ArrayList<String> doctors = new ArrayList<>();
+        for (User user : users) {
+            if (user instanceof Doctor) {
+                doctors.add(user.getFirstname() + " " + user.getLastname());
+            }
+        }
+        return doctors;
+    }
+    
+    public Response updatePatient(long id, String username, String firstname, String lastname, String password, String confirmPassword, String email, String birthdate, boolean gender, long phone, String address) {
         Patient patient = HospitalData.findPatientById(id);
-
         if (patient == null) {
             return new Response(StatusCode.NOT_FOUND, "Paciente no encontrado");
         }
-
         if (!password.equals(confirmPassword)) {
             return new Response(StatusCode.BAD_REQUEST, "Las contraseñas no coinciden");
         }
-
         if (!email.matches("^[\\w.-]+@[\\w.-]+\\.com$")) {
             return new Response(StatusCode.BAD_REQUEST, "Email inválido");
         }
-
         if (String.valueOf(phone).length() != 10) {
             return new Response(StatusCode.BAD_REQUEST, "El teléfono debe tener 10 dígitos");
         }
-
         LocalDate date;
-
         try {
             date = LocalDate.parse(birthdate);
         } catch (Exception e) {
             return new Response(StatusCode.BAD_REQUEST, "Fecha inválida");
         }
-
+        for (User u : users) {
+            if (u.getUsername().equals(username) && u.getId() != id) {
+                return new Response(StatusCode.CONFLICT, "El username ya existe");
+            }
+        }
+        
         patient.setUsername(username);
         patient.setFirstname(firstname);
         patient.setLastname(lastname);
@@ -211,10 +258,17 @@ public class PatientController {
         patient.setGender(gender);
         patient.setPhone(phone);
         patient.setAddress(address);
-
         return new Response(StatusCode.OK, "Paciente actualizado correctamente");
     }
     
+    private boolean doctorAvailable(Doctor doctor, LocalDateTime datetime) {
+        for (Appointment ap : appointments) {
+            if (ap.getDoctor() != null && ap.getDoctor().getId() == doctor.getId() && ap.getDatetime().equals(datetime) && ap.getStatus() != AppointmentStatus.CANCELED) {
+                return false;
+            }
+        }
+        return true;
+    }
     
 }
 
