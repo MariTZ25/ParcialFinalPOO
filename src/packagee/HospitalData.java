@@ -11,6 +11,8 @@ import modelo.Doctor;
 import modelo.Hospitalization;
 import modelo.Patient;
 import modelo.User;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 /**
  *
  * @author Sahid
@@ -93,5 +95,16 @@ public class HospitalData {
     public static boolean usernameExists(String username) {
 
         return findUserByUsername(username) != null;
+    }
+    // Bono 2
+    private static final PropertyChangeSupport support = new PropertyChangeSupport(HospitalData.class);
+//Genera Avisos al cambiar los datso
+    public static void addPropertyChangeListener(PropertyChangeListener pcl) {
+        support.addPropertyChangeListener(pcl);
+    }
+
+    // Este es el que se debe llamar
+    public static void fireTableChanged(String propertyName, Object oldValue, Object newValue) {
+        support.firePropertyChange(propertyName, oldValue, newValue);
     }
 }
