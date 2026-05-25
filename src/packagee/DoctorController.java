@@ -70,6 +70,8 @@ public class DoctorController {
 
         Doctor doctor = new Doctor(id, username, firstname, lastname, password, specialty, licenceNumber, assignedOffice);
         HospitalData.users.add(doctor);
+        
+        HospitalData.fireTableChanged("users", null, HospitalData.users);
 
         return new Response(StatusCode.CREATED, "Doctor registrado correctamente");
     }
