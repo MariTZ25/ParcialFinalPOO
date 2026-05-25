@@ -107,6 +107,8 @@ public class LoginController {
 
         users.add(new Patient(id, username, firstname, lastname, password,
                 email, birthdate, gender, phone, address));
+        
+        HospitalData.fireTableChanged("users", null, HospitalData.users);
 
         return new Response(StatusCode.CREATED, "Patient registered successfully");
     }

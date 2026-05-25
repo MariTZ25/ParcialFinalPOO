@@ -111,6 +111,7 @@ public class PatientController {
 
         Appointment ap = new Appointment(id, patient, doctor, specialty, dateTime, reason, type);
         appointments.add(ap);
+        HospitalData.fireTableChanged("appointments", null, HospitalData.appointments);
 
         return new Response(StatusCode.CREATED, "Cita creada correctamente");
     }
@@ -181,6 +182,8 @@ public class PatientController {
 
         Patient patient = new Patient(id, username, firstname, lastname, password, email, date, gender, phone, address);
         HospitalData.users.add(patient);
+        
+        HospitalData.fireTableChanged("users", null, HospitalData.users);
 
         return new Response(StatusCode.CREATED, "Paciente registrado correctamente");
     }
@@ -218,6 +221,8 @@ public class PatientController {
         for (User user : users) {
             if (user instanceof Doctor) {
                 doctors.add(user.getFirstname() + " " + user.getLastname());
+                
+        HospitalData.fireTableChanged("users", null, HospitalData.users);
             }
         }
         return doctors;
