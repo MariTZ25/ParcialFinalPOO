@@ -73,6 +73,7 @@ public class AppointmentController {
         Appointment appointment = new Appointment(id, patient, doctor, specialty, dateTime, reason, type);
 
         HospitalData.appointments.add(appointment);
+        HospitalData.fireTableChanged("appointments", null, HospitalData.appointments);
         patient.addAppointment(appointment);
 
         return new Response(StatusCode.CREATED, "Cita solicitada correctamente", id);
