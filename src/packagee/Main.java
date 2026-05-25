@@ -89,6 +89,10 @@ public class Main {
         //Create LoginController
         LoginController loginController = new LoginController(users, appointments, hospitalizations);
 
+        HospitalData.users = users;
+        HospitalData.appointments = appointments;
+        HospitalData.hospitalizations = hospitalizations;
+        
         //Launch LoginView
         java.awt.EventQueue.invokeLater(() ->
             new LoginView(loginController).setVisible(true)

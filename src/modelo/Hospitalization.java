@@ -55,9 +55,6 @@ public class Hospitalization {
         return status;
     }
     
-    
-    
-    
     public void setPatient(Patient patient) {
         this.patient = patient;
     }

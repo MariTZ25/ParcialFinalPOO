@@ -51,6 +51,11 @@ public class PatientView extends javax.swing.JFrame {
         } else {
             BackButton.setVisible(false);
         }
+        loadDoctors();
+        loadRoomTypes();
+        loadAppointmentsToCancel();
+        loadAppointmentHistory();
+        loadPatientData();
         this.setBackground(new Color(0, 0, 0, 0));
         this.setLocationRelativeTo(null);
     }

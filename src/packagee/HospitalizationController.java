@@ -84,4 +84,38 @@ public class HospitalizationController {
         }
         return String.format("H-%d-%04d", patientId, count);
     }
+    
+    public Response createHospitalizationFromDoctor(String patientIdText, long doctorId, String date, String reason, RoomType roomType, String observations)  {
+        long patientId;
+        try {
+            patientId = Long.parseLong(patientIdText);
+        } catch (Exception e) {
+            return new Response(StatusCode.BAD_REQUEST, "Seleccione un paciente válido");
+        }
+        
+        Patient patient = HospitalData.findPatientById(patientId);
+        Doctor doctor = HospitalData.findDoctorById(doctorId);
+
+        if (patient == null) {
+            return new Response(StatusCode.NOT_FOUND, "Paciente no encontrado");
+        }
+        if (doctor == null) {
+            return new Response(StatusCode.NOT_FOUND, "Doctor no encontrado");
+        }
+
+        LocalDate localDate;
+
+        try {
+            localDate = LocalDate.parse(date);
+        } catch (Exception e) {
+            return new Response(StatusCode.BAD_REQUEST, "Fecha inválida. Use AAAA-MM-DD");
+        }
+
+        String id = generateHospitalizationId(patientId);
+
+        Hospitalization hospitalization = new Hospitalization(id, patient, doctor, localDate, reason, roomType, observations);
+        hospitalization.setStatus(HospitalizationStatus.ONGOING);
+        HospitalData.hospitalizations.add(hospitalization);
+        return new Response(StatusCode.CREATED, "Hospitalización generada correctamente", id);
+    }
 }

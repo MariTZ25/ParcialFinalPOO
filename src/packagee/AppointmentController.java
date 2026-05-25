@@ -13,6 +13,7 @@ import modelo.Doctor;
 import modelo.Patient;
 import modelo.Prescription;
 import modelo.Specialty;
+import modelo.User;
 /**
  *
  * @author Sahid
@@ -78,24 +79,28 @@ public class AppointmentController {
     }
 
     public Response acceptAppointment(String appointmentId) {
-
-        Appointment appointment = HospitalData.findAppointmentById(appointmentId);
+        Appointment appointment = findAppointmentEverywhere(appointmentId);
 
         if (appointment == null) {
             return new Response(StatusCode.NOT_FOUND, "Cita no encontrada");
         }
+        if (appointment.getStatus() != AppointmentStatus.REQUESTED) {
+            return new Response(StatusCode.BAD_REQUEST, "Solo se pueden aceptar citas en estado REQUESTED");
+        }
 
         appointment.setStatus(AppointmentStatus.PENDING);
-
         return new Response(StatusCode.OK, "Cita aceptada correctamente");
-    }
+}
 
     public Response completeAppointment(String appointmentId) {
 
-        Appointment appointment = HospitalData.findAppointmentById(appointmentId);
+        Appointment appointment = findAppointmentEverywhere(appointmentId);
 
         if (appointment == null) {
             return new Response(StatusCode.NOT_FOUND, "Cita no encontrada");
+        }
+        if (appointment.getStatus() != AppointmentStatus.PENDING) {
+            return new Response(StatusCode.BAD_REQUEST, "Solo se pueden completar citas aceptadas");
         }
 
         appointment.setStatus(AppointmentStatus.COMPLETED);
@@ -122,7 +127,7 @@ public class AppointmentController {
 
     public Response prescribeMedication(String appointmentId, Prescription prescription) {
 
-        Appointment appointment = HospitalData.findAppointmentById(appointmentId);
+        Appointment appointment = findAppointmentEverywhere(appointmentId);
 
         if (appointment == null) {
             return new Response(StatusCode.NOT_FOUND, "Cita no encontrada");
@@ -162,5 +167,90 @@ public class AppointmentController {
         }
 
         return String.format("A-%d-%04d", patientId, count);
+    }
+    
+    public Response rescheduleAppointment(String appointmentId, String newTime, String reason) {
+        Appointment appointment = findAppointmentEverywhere(appointmentId);
+        if (appointment == null) {
+            return new Response(StatusCode.NOT_FOUND, "Cita no encontrada");
+        }
+        LocalTime localTime;
+        try {
+            localTime = LocalTime.parse(newTime);
+        } catch (Exception e) {
+            return new Response(StatusCode.BAD_REQUEST, "Hora inválida. Use hh:mm");
+        }
+        int minutes = localTime.getMinute();
+        if (minutes != 0 && minutes != 15 && minutes != 30 && minutes != 45) {
+            return new Response(StatusCode.BAD_REQUEST, "Los minutos deben ser 00, 15, 30 o 45");
+        }
+        LocalDateTime newDateTime = LocalDateTime.of(appointment.getDatetime().toLocalDate(), localTime);
+
+        if (!doctorAvailable(appointment.getDoctor(), newDateTime)) {
+            return new Response(StatusCode.CONFLICT, "El doctor no está disponible en esa hora");
+        }
+        appointment.setDatetime(newDateTime);
+        appointment.setReason(appointment.getReason() + " | Reprogramación: " + reason);
+        return new Response(StatusCode.OK, "Cita reprogramada correctamente");
+    }
+    
+    private Appointment findAppointmentEverywhere(String appointmentId) {
+        for (Appointment appointment : HospitalData.appointments) {
+            if (appointment.getId().equals(appointmentId)) {
+                return appointment;
+            }
+        }
+
+        for (User user : HospitalData.users) {
+            if (user instanceof Doctor) {
+                Doctor doctor = (Doctor) user;
+                for (Appointment appointment : doctor.getAppointments()) {
+                    if (appointment.getId().equals(appointmentId)) {
+                        return appointment;
+                    }
+                }
+            }
+
+            if (user instanceof Patient) {
+                Patient patient = (Patient) user;
+                for (Appointment appointment : patient.getAppointments()) {
+                    if (appointment.getId().equals(appointmentId)) {
+                        return appointment;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+    
+    public Response prescribeMedications(String[][] medicationsData) {
+        if (medicationsData == null || medicationsData.length == 0) {
+            return new Response(StatusCode.BAD_REQUEST, "No hay medicamentos para prescribir");
+        }
+
+        for (String[] row : medicationsData) {
+            String appointmentId = row[0];
+            Appointment appointment = findAppointmentEverywhere(appointmentId);
+
+            if (appointment == null) {
+                return new Response(StatusCode.NOT_FOUND, "Cita no encontrada: " + appointmentId);
+            }
+            if (appointment.getStatus() != AppointmentStatus.PENDING) {
+                return new Response(StatusCode.BAD_REQUEST, "Solo se puede prescribir en citas aceptadas");
+            }
+            double dose;
+            int treatmentDuration;
+            int frecuency;
+            try {
+                dose = Double.parseDouble(row[2]);
+                treatmentDuration = Integer.parseInt(row[4]);
+                frecuency = Integer.parseInt(row[6]);
+            } catch (NumberFormatException e) {
+                return new Response(StatusCode.BAD_REQUEST, "Dosis, duración y frecuencia deben ser numéricas");
+            }
+            new Prescription(appointment, row[1], dose, row[3], treatmentDuration, row[5], frecuency);
+        }
+        return new Response(StatusCode.OK, "Medicamentos prescritos correctamente");
     }
 }
