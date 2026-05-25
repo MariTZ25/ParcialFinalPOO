@@ -59,5 +59,6 @@ public class LoadData {
                 HospitalData.users.add(doctor);
             }
         }
+        HospitalData.fireTableChanged("users", null, HospitalData.users);
     }
 }
