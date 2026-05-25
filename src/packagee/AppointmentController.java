@@ -73,8 +73,11 @@ public class AppointmentController {
         Appointment appointment = new Appointment(id, patient, doctor, specialty, dateTime, reason, type);
 
         HospitalData.appointments.add(appointment);
-        HospitalData.fireTableChanged("appointments", null, HospitalData.appointments);
         patient.addAppointment(appointment);
+       
+       HospitalData.fireTableChanged("appointments", null, HospitalData.appointments);
+       
+        
 
         return new Response(StatusCode.CREATED, "Cita solicitada correctamente", id);
     }
@@ -90,6 +93,7 @@ public class AppointmentController {
         }
 
         appointment.setStatus(AppointmentStatus.PENDING);
+        HospitalData.fireTableChanged("appointments", null, HospitalData.appointments);
         return new Response(StatusCode.OK, "Cita aceptada correctamente");
 }
 
@@ -105,6 +109,7 @@ public class AppointmentController {
         }
 
         appointment.setStatus(AppointmentStatus.COMPLETED);
+        HospitalData.fireTableChanged("appointments", null, HospitalData.appointments);
 
         return new Response(StatusCode.OK, "Cita completada correctamente");
     }
@@ -122,6 +127,7 @@ public class AppointmentController {
         }
 
         appointment.setStatus(AppointmentStatus.CANCELED);
+        HospitalData.fireTableChanged("appointments", null, HospitalData.appointments);
 
         return new Response(StatusCode.OK, "Cita cancelada correctamente");
     }
