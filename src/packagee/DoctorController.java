@@ -115,5 +115,21 @@ public class DoctorController {
         return new Response(StatusCode.OK, "Doctor actualizado correctamente");
     }
     
+    public Response validateMedicationToAdd(String appointmentId, String medicationName, String doseText, String administrationRoute, String treatmentDurationText, String additionalInstructions, String frequencyText) {
+        if (appointmentId == null || appointmentId.equals("Select one") || medicationName.trim().isEmpty() || doseText.trim().isEmpty() || administrationRoute.trim().isEmpty() || treatmentDurationText.trim().isEmpty() || additionalInstructions.trim().isEmpty() || frequencyText.trim().isEmpty()) {
+            return new Response(StatusCode.BAD_REQUEST, "Complete todos los campos");
+        }
+
+        try {
+            Double.parseDouble(doseText);
+            Integer.parseInt(treatmentDurationText);
+            Integer.parseInt(frequencyText);
+        } catch (NumberFormatException e) {
+            return new Response(StatusCode.BAD_REQUEST, "Dose, Treatment duration and frecuency they must be numerical");
+        }
+
+        String data = appointmentId + ";" + medicationName + ";" + doseText + ";" + administrationRoute + ";" + treatmentDurationText + ";" + additionalInstructions + ";" + frequencyText;
+        return new Response(StatusCode.OK, "Medicamento agregado a la tabla", data);
+    }
     
 }

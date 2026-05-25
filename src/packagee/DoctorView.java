@@ -51,6 +51,8 @@ public class DoctorView extends javax.swing.JFrame {
         loadPatients();
         loadHospitalizations();
         loadDoctorData();
+        DefaultTableModel model = (DefaultTableModel) PrescribeMedicationsTable.getModel();
+        model.setRowCount(0);
         if (user instanceof Administrator)
             BackButton.setVisible(true);
         else    
@@ -1334,22 +1336,25 @@ public class DoctorView extends javax.swing.JFrame {
         }
         Response response = appointmentController.prescribeMedications(medicationsData);
         showResponse(response);
+        
         if (response.isSuccess()) {
+            JOptionPane.showMessageDialog(this, "The prescriptions were stored correctly", "Prescribe", JOptionPane.INFORMATION_MESSAGE);
             model.setRowCount(0);
         }
     }//GEN-LAST:event_PrescribeButtonActionPerformed
 
     private void AddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddButtonActionPerformed
-        String appointmentId = PrescribeMedication_AppointmentIDComboBox.getSelectedItem().toString();
-        String medicationName = MedicationNameTextField.getText();
-        String dose = DoseTextField.getText();
-        String administrationRoute = AdministrationRouteTextField.getText();
-        String treatmentDuration = TreatmentDurationTextField.getText();
-        String additionalInstructions = AdditionalInstructionsTextField.getText();
-        String frecuency = FrecuencyTextField.getText();
+        Response response = doctorController.validateMedicationToAdd(PrescribeMedication_AppointmentIDComboBox.getSelectedItem().toString(), MedicationNameTextField.getText(), DoseTextField.getText(), AdministrationRouteTextField.getText(), TreatmentDurationTextField.getText(), AdditionalInstructionsTextField.getText(), FrecuencyTextField.getText());
 
+        showResponse(response);
+
+        if (!response.isSuccess()) {
+            return;
+        }
+
+        String[] row = response.getData().split(";");
         DefaultTableModel model = (DefaultTableModel) PrescribeMedicationsTable.getModel();
-        model.addRow(new Object[]{appointmentId, medicationName, dose, administrationRoute, treatmentDuration, additionalInstructions, frecuency });
+        model.addRow(row);
         cleanPrescribeFields();
     }//GEN-LAST:event_AddButtonActionPerformed
 

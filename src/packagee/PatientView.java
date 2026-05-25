@@ -46,16 +46,18 @@ public class PatientView extends javax.swing.JFrame {
         this.appointments = appointments;
         this.patientController = new PatientController(users, appointments, hospitalizations);
         hospitalizationController = new HospitalizationController();
-        if (user instanceof Administrator) {
-            BackButton.setVisible(true);
-        } else {
-            BackButton.setVisible(false);
-        }
+        
         loadDoctors();
         loadRoomTypes();
         loadAppointmentsToCancel();
         loadAppointmentHistory();
         loadPatientData();
+        
+        if (user instanceof Administrator) {
+            BackButton.setVisible(true);
+        } else {
+            BackButton.setVisible(false);
+        }
         this.setBackground(new Color(0, 0, 0, 0));
         this.setLocationRelativeTo(null);
     }

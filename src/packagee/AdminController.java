@@ -43,18 +43,21 @@ public class AdminController {
     }
     
     public Response registerDoctor(String firstname, String lastname, String idText, String spec, String licenseNumber, String assignedOffice, String username, String password, String comPassword) {
-        //Validations
-        if (firstname.trim().isEmpty() || lastname.trim().isEmpty() || idText.trim().isEmpty() || username.trim().isEmpty() || password.trim().isEmpty() || comPassword.trim().isEmpty()) {
+        if (firstname.trim().isEmpty() || lastname.trim().isEmpty() || idText.trim().isEmpty() || username.trim().isEmpty() || password.trim().isEmpty() || comPassword.trim().isEmpty() || licenseNumber.trim().isEmpty() || assignedOffice.trim().isEmpty()) {
             return new Response(StatusCode.BAD_REQUEST, "Complete all required fields");
         }
-        
+
         long id;
+
         try {
             id = Long.parseLong(idText);
         } catch (NumberFormatException e) {
             return new Response(StatusCode.BAD_REQUEST, "ID must be numeric");
         }
-        
+
+        if (id <= 0 || idText.length() != 12) {
+            return new Response(StatusCode.BAD_REQUEST, "ID must have exactly 12 digits");
+        }
         if (spec.equals("Select one")) {
             return new Response(StatusCode.BAD_REQUEST, "Select a specialty");
         }
@@ -64,14 +67,24 @@ public class AdminController {
 
         for (User u : users) {
             if (u.getId() == id) {
-                return new Response(StatusCode.CONFLICT,"ID already exists");
+                return new Response(StatusCode.CONFLICT, "ID already exists");
+            }
+            if (u.getUsername().equals(username)) {
+                return new Response(StatusCode.CONFLICT, "Username already exists");
             }
         }
-        //Successfully created
+
+        if (!licenseNumber.matches("^L-\\d{10} MTL$")) {
+            return new Response(StatusCode.BAD_REQUEST, "Invalid license format. Use L-XXXXXXXXXX MTL");
+        }
+        if (!assignedOffice.matches("^O-\\d{3}$")) {
+            return new Response(StatusCode.BAD_REQUEST, "Invalid office format. Use O-XXX");
+        }
+
         Specialty specialty = Specialty.fromDisplayName(spec);
         users.add(new Doctor(id, username, firstname, lastname, password, specialty, licenseNumber, assignedOffice));
         return new Response(StatusCode.CREATED, "Doctor registered successfully");
-    }  
+    }
     
     public Doctor findDoctorById(String idText) {
         if (idText.equals("Select one")) {
